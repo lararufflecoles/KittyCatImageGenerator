@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">KittyCat IG</string>
+    <string name="main_activity_toolbar_name">KittyCat Image Generator</string>
+
+    <string name="button_kitty">Generate Kitty</string>
+    <string name="button_cat">Generate Cat</string>
+</resources>
