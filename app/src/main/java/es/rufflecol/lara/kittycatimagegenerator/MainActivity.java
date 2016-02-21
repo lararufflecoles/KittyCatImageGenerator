@@ -10,22 +10,14 @@ import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
-import java.io.IOException;
-
 import es.rufflecol.lara.kittycatimagegenerator.API.KittyCatAPI;
+import es.rufflecol.lara.kittycatimagegenerator.API.KittyCatAPIFactory;
 import es.rufflecol.lara.kittycatimagegenerator.Model.KittyCatModel;
-import okhttp3.Interceptor;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MainActivity extends AppCompatActivity implements Callback<KittyCatModel> {
-
-    private static final String API_BASE_URL = "https://nijikokun-random-cats.p.mashape.com";
 
     private KittyCatAPI api;
     private ImageView imageView;
@@ -40,27 +32,7 @@ public class MainActivity extends AppCompatActivity implements Callback<KittyCat
         setTitle(R.string.main_activity_toolbar_name);
         setSupportActionBar(toolbar);
 
-        OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
-        httpClient.addInterceptor(new Interceptor() {
-            @Override
-            public okhttp3.Response intercept(Chain chain) throws IOException {
-                Request original = chain.request();
-                Request request = original.newBuilder()
-                        .header("X-Mashape-Key", "rElncNLHLPmshc3cqJMrdQHa8daxp1kXSXDjsn0TWiEzwIxda4")
-                        .header("Accept", "application/json")
-                        .method(original.method(), original.body())
-                        .build();
-                return chain.proceed(request);
-            }
-        });
-
-        OkHttpClient client = httpClient.build();
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(API_BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .client(client)
-                .build();
-        api = retrofit.create(KittyCatAPI.class);
+        api = KittyCatAPIFactory.create();
 
         Button buttonKitty = (Button) findViewById(R.id.button_kitty);
         buttonKitty.setOnClickListener(new View.OnClickListener() {
@@ -82,7 +54,7 @@ public class MainActivity extends AppCompatActivity implements Callback<KittyCat
     }
 
     @Override
-        public void onResponse(Call<KittyCatModel> call, Response<KittyCatModel> response) {
+    public void onResponse(Call<KittyCatModel> call, Response<KittyCatModel> response) {
         imageView = (ImageView) findViewById(R.id.image);
         KittyCatModel model = response.body();
         String url = model.getSource();
