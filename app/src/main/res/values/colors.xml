@@ -5,4 +5,7 @@
 
     <color name="colorToolbarBackground">#3F51B5</color>
     <color name="colorToolbarText">#FFFFFF</color>
+
+    <color name="colorAboutText">#000000</color>
+    <color name="colorLinkText">#6EB4AE</color>
 </resources>

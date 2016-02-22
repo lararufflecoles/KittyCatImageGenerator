@@ -1,8 +1,12 @@
 package es.rufflecol.lara.kittycatimagegenerator;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -30,7 +34,7 @@ public class MainActivity extends AppCompatActivity implements Callback<KittyCat
         setContentView(R.layout.activity_main);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.setTitleTextAppearance(this, R.style.ToolbarAppearance);
+        toolbar.setTitleTextAppearance(this, R.style.Toolbar);
         setTitle(R.string.main_activity_toolbar_name);
         setSupportActionBar(toolbar);
 
@@ -86,5 +90,27 @@ public class MainActivity extends AppCompatActivity implements Callback<KittyCat
     @Override
     public void onError() {
         progress.setVisibility(View.INVISIBLE);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_main, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_about:
+                openAbout();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void openAbout() {
+        Intent openAbout = new Intent(this, AboutActivity.class);
+        startActivity(openAbout);
     }
 }

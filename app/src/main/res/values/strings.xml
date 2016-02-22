@@ -4,4 +4,15 @@
 
     <string name="button_kitty">Generate Kitty</string>
     <string name="button_cat">Generate Cat</string>
+
+    <!--About-->
+    <string name="about">About</string>
+    <string name="about_detail">\nApp designed and coded by Lara Ruffle Coles
+        \n\n<a href="mailto:lararuffle@lararuffle.co.uk?subject=KittyCat Image Generator">Email</a>
+        \t<a href="http://lara.rufflecol.es">Website</a>
+        \t<a href="https://github.com/lararufflecoles">GitHub</a>
+        \t<a href="http://uk.linkedin.com/in/lararufflecoles">LinkedIn</a>
+        \t<a href="https://twitter.com/lararufflecoles">Twitter</a>
+    </string>
+
 </resources>
