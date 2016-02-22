@@ -24,9 +24,28 @@ import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity implements Callback<KittyCatModel>, com.squareup.picasso.Callback {
 
+    private static final String KEY_URL = "MainActivity.Key_URL";
+
     private KittyCatAPI api;
     private ImageView imageView;
     private ProgressBar progress;
+    private String url;
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+        savedInstanceState.putString(KEY_URL, url);
+    }
+
+    public void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        url = savedInstanceState.getString(KEY_URL);
+        Picasso.with(this)
+                .load(url)
+                .fit()
+                .centerInside()
+                .into(imageView, this);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,7 +86,7 @@ public class MainActivity extends AppCompatActivity implements Callback<KittyCat
     @Override
     public void onResponse(Call<KittyCatModel> call, Response<KittyCatModel> response) {
         KittyCatModel model = response.body();
-        String url = model.getSource();
+        url = model.getSource();
         Picasso.with(this)
                 .load(url)
                 .fit()
