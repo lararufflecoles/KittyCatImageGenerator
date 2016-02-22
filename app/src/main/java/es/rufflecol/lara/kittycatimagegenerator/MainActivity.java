@@ -6,6 +6,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
@@ -17,10 +18,11 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class MainActivity extends AppCompatActivity implements Callback<KittyCatModel> {
+public class MainActivity extends AppCompatActivity implements Callback<KittyCatModel>, com.squareup.picasso.Callback {
 
     private KittyCatAPI api;
     private ImageView imageView;
+    private ProgressBar progress;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +34,9 @@ public class MainActivity extends AppCompatActivity implements Callback<KittyCat
         setTitle(R.string.main_activity_toolbar_name);
         setSupportActionBar(toolbar);
 
+        progress = (ProgressBar) findViewById(R.id.progress_bar);
+        imageView = (ImageView) findViewById(R.id.image);
+
         api = KittyCatAPIFactory.create();
 
         Button buttonKitty = (Button) findViewById(R.id.button_kitty);
@@ -40,6 +45,7 @@ public class MainActivity extends AppCompatActivity implements Callback<KittyCat
             public void onClick(View view) {
                 Call<KittyCatModel> call = api.getRandomKitty();
                 call.enqueue(MainActivity.this);
+                progress.setVisibility(View.VISIBLE);
             }
         });
 
@@ -49,22 +55,36 @@ public class MainActivity extends AppCompatActivity implements Callback<KittyCat
             public void onClick(View view) {
                 Call<KittyCatModel> call = api.getRandomCat();
                 call.enqueue(MainActivity.this);
+                progress.setVisibility(View.VISIBLE);
             }
         });
     }
 
     @Override
     public void onResponse(Call<KittyCatModel> call, Response<KittyCatModel> response) {
-        imageView = (ImageView) findViewById(R.id.image);
         KittyCatModel model = response.body();
         String url = model.getSource();
         Picasso.with(this)
                 .load(url)
-                .into(imageView);
+                .fit()
+                .centerInside()
+                .into(imageView, this);
     }
 
     @Override
     public void onFailure(Call<KittyCatModel> call, Throwable throwable) {
         Toast.makeText(this, "Failed to access images", Toast.LENGTH_LONG).show();
+        progress.setVisibility(View.INVISIBLE);
+    }
+
+    // These two methods specifically relate to the com.squareup.picasso.Callback implementation
+    @Override
+    public void onSuccess() {
+        progress.setVisibility(View.INVISIBLE);
+    }
+
+    @Override
+    public void onError() {
+        progress.setVisibility(View.INVISIBLE);
     }
 }
