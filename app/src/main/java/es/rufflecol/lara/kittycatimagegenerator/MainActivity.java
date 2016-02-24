@@ -1,6 +1,9 @@
 package es.rufflecol.lara.kittycatimagegenerator;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -13,7 +16,20 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.login.LoginManager;
+import com.facebook.login.LoginResult;
+import com.facebook.share.ShareApi;
+import com.facebook.share.model.SharePhoto;
+import com.facebook.share.model.SharePhotoContent;
+import com.facebook.share.widget.ShareButton;
 import com.squareup.picasso.Picasso;
+import com.facebook.FacebookSdk;
+
+import java.util.Arrays;
+import java.util.List;
 
 import es.rufflecol.lara.kittycatimagegenerator.API.KittyCatAPI;
 import es.rufflecol.lara.kittycatimagegenerator.API.KittyCatAPIFactory;
@@ -30,6 +46,9 @@ public class MainActivity extends AppCompatActivity implements Callback<KittyCat
     private ImageView imageView;
     private ProgressBar progress;
     private String url;
+    private CallbackManager callbackManager;
+    private LoginManager loginManager;
+    private Bitmap bitmap;
 
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
@@ -57,6 +76,8 @@ public class MainActivity extends AppCompatActivity implements Callback<KittyCat
         setTitle(R.string.main_activity_toolbar_name);
         setSupportActionBar(toolbar);
 
+        FacebookSdk.sdkInitialize(getApplicationContext());
+
         progress = (ProgressBar) findViewById(R.id.progress_bar);
         imageView = (ImageView) findViewById(R.id.image);
 
@@ -81,8 +102,58 @@ public class MainActivity extends AppCompatActivity implements Callback<KittyCat
                 progress.setVisibility(View.VISIBLE);
             }
         });
+
+        Button buttonFacebook = (Button) findViewById(R.id.button_facebook);
+        buttonFacebook.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                shareToFacebook();
+            }
+        });
     }
 
+    private void shareToFacebook() {
+        callbackManager = CallbackManager.Factory.create();
+        List<String> permissionNeeds = Arrays.asList("publish_actions");
+        loginManager = LoginManager.getInstance(); // loginManager helps you eliminate adding a LoginButton to your UI
+        loginManager.logInWithPublishPermissions(MainActivity.this, permissionNeeds);
+        loginManager.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
+            @Override
+            public void onSuccess(LoginResult loginResult) {
+                BitmapDrawable imageDrawable = (BitmapDrawable) imageView.getDrawable();
+                bitmap = imageDrawable.getBitmap();
+                SharePhoto photo = new SharePhoto.Builder()
+                        .setBitmap(bitmap)
+                        .setCaption("Test")
+                        .build();
+                SharePhotoContent content = new SharePhotoContent.Builder()
+                        .addPhoto(photo)
+                        .build();
+                ShareApi.share(content, null);
+                Toast.makeText(MainActivity.this, "Share successful", Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onCancel() {
+                System.out.println("onCancel");
+                Toast.makeText(MainActivity.this, "Share cancelled", Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onError(FacebookException exception) {
+                System.out.println("onError");
+                Toast.makeText(MainActivity.this, "Share errored", Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int responseCode, Intent data) {
+        super.onActivityResult(requestCode, responseCode, data);
+        callbackManager.onActivityResult(requestCode, responseCode, data);
+    }
+
+    // These two methods are from the retrofit2 Callback interface methods
     @Override
     public void onResponse(Call<KittyCatModel> call, Response<KittyCatModel> response) {
         KittyCatModel model = response.body();
@@ -100,7 +171,7 @@ public class MainActivity extends AppCompatActivity implements Callback<KittyCat
         progress.setVisibility(View.INVISIBLE);
     }
 
-    // These two methods specifically relate to the com.squareup.picasso.Callback implementation
+    // These two methods are from the com.squareup.picasso.Callback implementation
     @Override
     public void onSuccess() {
         progress.setVisibility(View.INVISIBLE);
@@ -111,6 +182,7 @@ public class MainActivity extends AppCompatActivity implements Callback<KittyCat
         progress.setVisibility(View.INVISIBLE);
     }
 
+    // Menu code
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();

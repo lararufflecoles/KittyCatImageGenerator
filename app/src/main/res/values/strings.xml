@@ -4,6 +4,7 @@
 
     <string name="button_kitty">Generate Kitty</string>
     <string name="button_cat">Generate Cat</string>
+    <string name="button_facebook">Share to Facebook</string>
 
     <!--About-->
     <string name="about">About</string>
@@ -14,5 +15,9 @@
         \t<a href="http://uk.linkedin.com/in/lararufflecoles">LinkedIn</a>
         \t<a href="https://twitter.com/lararufflecoles">Twitter</a>
     </string>
+
+    <!--Facebook-->
+    <string name="facebook_app_id">1751997151688923</string>
+
 
 </resources>
