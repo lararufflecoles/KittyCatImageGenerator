@@ -1,10 +1,21 @@
 <resources>
     <string name="app_name">KittyCat IG</string>
-    <string name="main_activity_toolbar_name">KittyCat Image Generator</string>
 
+    <!--Main Activity-->
+    <string name="main_activity_toolbar_name">KittyCat Image Generator</string>
     <string name="button_kitty">Generate Kitty</string>
     <string name="button_cat">Generate Cat</string>
     <string name="button_facebook">Share to Facebook</string>
+
+    <!--Alert Dialog-->
+    <string name="alert_dialog_title">Share to Facebook</string>
+    <string name="alert_dialog_back">Back</string>
+    <string name="alert_dialog_share">Share</string>
+
+    <!--Alert Dialog - Share to Facebook-->
+    <string name="share_to_facebook_on_success_fail">Generate Kitty or Cat before sharing</string>
+    <string name="share_to_facebook_on_cancel">Share cancelled</string>
+    <string name="share_to_facebook_on_error">Share failed</string>
 
     <!--About-->
     <string name="about">About</string>

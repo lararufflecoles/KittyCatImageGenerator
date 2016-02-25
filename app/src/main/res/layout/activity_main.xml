@@ -12,10 +12,11 @@
         android:minHeight="?attr/actionBarSize" />
 
     <LinearLayout
-        android:id="@+id/button_layout"
+        android:id="@+id/button_layout_generate"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/toolbar"
+        android:orientation="horizontal"
         android:padding="10dp">
 
         <Button
@@ -44,8 +45,8 @@
     <ImageView
         android:id="@+id/image"
         android:layout_width="match_parent"
-        android:layout_height="360dp"
-        android:layout_below="@id/button_layout"
+        android:layout_height="350dp"
+        android:layout_below="@id/button_layout_generate"
         android:layout_marginBottom="17dp"
         android:layout_marginLeft="15dp"
         android:layout_marginRight="15dp"
@@ -56,21 +57,43 @@
         android:id="@+id/progress_bar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/button_layout"
+        android:layout_below="@id/button_layout_generate"
         android:layout_centerHorizontal="true"
         android:layout_gravity="center"
         android:layout_marginTop="30dp"
         android:indeterminate="true"
         android:visibility="invisible" />
 
-    <Button
-        android:id="@+id/button_facebook"
-        style="@style/Button"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:id="@+id/button_layout_facebook"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/image"
-        android:layout_centerHorizontal="true"
-        android:gravity="center"
-        android:text="@string/button_facebook"/>
+        android:orientation="horizontal">
+
+        <Space
+            android:id="@+id/space_left"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.5" />
+
+        <Button
+            android:id="@+id/button_facebook"
+            style="@style/Button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/image"
+            android:layout_weight="1"
+            android:enabled="false"
+            android:gravity="center"
+            android:text="@string/button_facebook" />
+
+        <Space
+            android:id="@+id/space_right"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.5" />
+
+    </LinearLayout>
 
 </RelativeLayout>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <dimen name="textSizeToolbar">18sp</dimen>
+    <dimen name="textSizeHeader">18sp</dimen>
 
     <dimen name="textSizeNormal">16sp</dimen>
 

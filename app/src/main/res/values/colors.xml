@@ -6,6 +6,15 @@
     <color name="colorToolbarBackground">#3F51B5</color>
     <color name="colorToolbarText">#FFFFFF</color>
 
+    <color name="colorButtonText">#FFFFFF</color>
+
+    <color name="colorAlertDialogText">#000000</color>
+
     <color name="colorAboutText">#000000</color>
-    <color name="colorLinkText">#6EB4AE</color>
 </resources>
+
+
+
+
+
+<!--Hex code for the link text is #6EB4AE-->
