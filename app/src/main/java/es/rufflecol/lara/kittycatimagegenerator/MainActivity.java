@@ -1,62 +1,55 @@
 package es.rufflecol.lara.kittycatimagegenerator;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.facebook.CallbackManager;
-import com.facebook.FacebookCallback;
-import com.facebook.FacebookException;
-import com.facebook.login.LoginManager;
-import com.facebook.login.LoginResult;
-import com.facebook.share.ShareApi;
+import com.facebook.FacebookSdk;
 import com.facebook.share.model.SharePhoto;
 import com.facebook.share.model.SharePhotoContent;
+import com.facebook.share.widget.ShareDialog;
 import com.squareup.picasso.Picasso;
-import com.facebook.FacebookSdk;
+import com.twitter.sdk.android.core.TwitterAuthConfig;
+import com.twitter.sdk.android.core.TwitterCore;
 import com.twitter.sdk.android.tweetcomposer.TweetComposer;
 
 import java.io.ByteArrayOutputStream;
-import java.util.Arrays;
-import java.util.List;
 
 import es.rufflecol.lara.kittycatimagegenerator.API.KittyCatAPI;
 import es.rufflecol.lara.kittycatimagegenerator.API.KittyCatAPIFactory;
 import es.rufflecol.lara.kittycatimagegenerator.Model.KittyCatModel;
+import io.fabric.sdk.android.Fabric;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-import static android.support.v7.app.AlertDialog.*;
-
 public class MainActivity extends AppCompatActivity implements Callback<KittyCatModel>, com.squareup.picasso.Callback {
 
+    private static final String TWITTER_KEY = "6ztLMhGmShpEmvqwm2QYr7uGX";
+    private static final String TWITTER_SECRET = "YEGuJUd7H3OgNGJP7yTPrYDaQIbh76Hi0DqVjOcQ8ddqqbQM07";
     private static final String KEY_URL = "MainActivity.Key_URL";
 
-    private Button buttonTwitter;
     private Button buttonFacebook;
+    private Button buttonTwitter;
     private CallbackManager callbackManager;
-    private EditText alertDialogShareCaption;
     private ImageView imageView;
     private KittyCatAPI api;
     private ProgressBar progressWheel;
+    private ShareDialog shareDialog;
     private String url;
 
     @Override
@@ -90,7 +83,12 @@ public class MainActivity extends AppCompatActivity implements Callback<KittyCat
 
         api = KittyCatAPIFactory.create();
 
+        TwitterAuthConfig authConfig = new TwitterAuthConfig(TWITTER_KEY, TWITTER_SECRET);
+        Fabric.with(this, new TwitterCore(authConfig), new TweetComposer());
+
         FacebookSdk.sdkInitialize(getApplicationContext());
+        callbackManager = CallbackManager.Factory.create();
+        shareDialog = new ShareDialog(this);
 
         Button buttonKitty = (Button) findViewById(R.id.button_kitty);
         buttonKitty.setOnClickListener(new View.OnClickListener() {
@@ -124,33 +122,9 @@ public class MainActivity extends AppCompatActivity implements Callback<KittyCat
         buttonFacebook.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                shareToFacebookAlertDialog();
+                shareToFacebook();
             }
         });
-    }
-
-    private void shareToFacebookAlertDialog() {
-        LayoutInflater inflater = getLayoutInflater();
-        View alertLayout = inflater.inflate(R.layout.alert_dialog, null);
-
-        alertDialogShareCaption = (EditText) alertLayout.findViewById(R.id.caption);
-
-        AlertDialog.Builder alertDialogBuilder = new Builder(MainActivity.this);
-        alertDialogBuilder
-                .setView(alertLayout)
-                .setCancelable(true) // Allows user to use back button to exit dialog
-                .setNegativeButton(R.string.alert_dialog_back, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        dialog.cancel();
-                    }
-                })
-                .setPositiveButton(R.string.alert_dialog_share, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        shareToFacebook();
-                    }
-                });
-        AlertDialog alertDialog = alertDialogBuilder.create();
-        alertDialog.show();
     }
 
     private void shareToTwitter() {
@@ -173,41 +147,20 @@ public class MainActivity extends AppCompatActivity implements Callback<KittyCat
     }
 
     private void shareToFacebook() {
-        callbackManager = CallbackManager.Factory.create();
-        List<String> permissionNeeds = Arrays.asList("publish_actions");
-        LoginManager loginManager = LoginManager.getInstance();
-        loginManager.logInWithPublishPermissions(MainActivity.this, permissionNeeds);
-        loginManager.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
-            @Override
-            public void onSuccess(LoginResult loginResult) {
-                BitmapDrawable imageDrawable = (BitmapDrawable) imageView.getDrawable();
-                if (imageDrawable != null) {
-                    Bitmap bitmap = imageDrawable.getBitmap();
-                    SharePhoto photo = new SharePhoto.Builder()
-                            .setBitmap(bitmap)
-                            .setCaption(alertDialogShareCaption.getText().toString())
-                            .build();
-                    SharePhotoContent content = new SharePhotoContent.Builder()
-                            .addPhoto(photo)
-                            .build();
-                    ShareApi.share(content, null);
-                } else {
-                    Toast.makeText(MainActivity.this, R.string.share_to_facebook_on_success_fail, Toast.LENGTH_LONG).show();
-                }
-            }
-
-            @Override
-            public void onCancel() {
-                System.out.println("onCancel");
-                Toast.makeText(MainActivity.this, R.string.share_to_facebook_on_cancel, Toast.LENGTH_LONG).show();
-            }
-
-            @Override
-            public void onError(FacebookException exception) {
-                System.out.println("onError");
-                Toast.makeText(MainActivity.this, R.string.share_to_facebook_on_error, Toast.LENGTH_LONG).show();
-            }
-        });
+        BitmapDrawable imageDrawable = (BitmapDrawable) imageView.getDrawable();
+        if (imageDrawable != null) {
+            Bitmap bitmap = imageDrawable.getBitmap();
+            SharePhoto photo = new SharePhoto.Builder()
+                    .setBitmap(bitmap)
+                    .setCaption(getString(R.string.share_caption))
+                    .build();
+            SharePhotoContent content = new SharePhotoContent.Builder()
+                    .addPhoto(photo)
+                    .build();
+            shareDialog.show(content);
+        } else {
+            Toast.makeText(MainActivity.this, R.string.share_fail, Toast.LENGTH_LONG).show();
+        }
     }
 
     // Method integral to the Facebook SDK CallbackManager
