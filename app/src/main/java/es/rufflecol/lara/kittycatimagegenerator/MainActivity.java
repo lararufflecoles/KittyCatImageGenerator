@@ -4,7 +4,9 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -29,7 +31,9 @@ import com.facebook.share.model.SharePhoto;
 import com.facebook.share.model.SharePhotoContent;
 import com.squareup.picasso.Picasso;
 import com.facebook.FacebookSdk;
+import com.twitter.sdk.android.tweetcomposer.TweetComposer;
 
+import java.io.ByteArrayOutputStream;
 import java.util.Arrays;
 import java.util.List;
 
@@ -46,6 +50,7 @@ public class MainActivity extends AppCompatActivity implements Callback<KittyCat
 
     private static final String KEY_URL = "MainActivity.Key_URL";
 
+    private Button buttonTwitter;
     private Button buttonFacebook;
     private CallbackManager callbackManager;
     private EditText alertDialogShareCaption;
@@ -107,6 +112,14 @@ public class MainActivity extends AppCompatActivity implements Callback<KittyCat
             }
         });
 
+        buttonTwitter = (Button) findViewById(R.id.button_twitter);
+        buttonTwitter.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                shareToTwitter();
+            }
+        });
+
         buttonFacebook = (Button) findViewById(R.id.button_facebook);
         buttonFacebook.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -120,7 +133,7 @@ public class MainActivity extends AppCompatActivity implements Callback<KittyCat
         LayoutInflater inflater = getLayoutInflater();
         View alertLayout = inflater.inflate(R.layout.alert_dialog, null);
 
-        alertDialogShareCaption = (EditText) alertLayout.findViewById(R.id.caption_facebook);
+        alertDialogShareCaption = (EditText) alertLayout.findViewById(R.id.caption);
 
         AlertDialog.Builder alertDialogBuilder = new Builder(MainActivity.this);
         alertDialogBuilder
@@ -133,20 +146,33 @@ public class MainActivity extends AppCompatActivity implements Callback<KittyCat
                 })
                 .setPositiveButton(R.string.alert_dialog_share, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        shareToFacebookContent();
+                        shareToFacebook();
                     }
                 });
         AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.show();
-
-//        Button negativeButton = alertDialog.getButton(DialogInterface.BUTTON_NEGATIVE);
-//        negativeButton.setBackgroundColor(getResources().getColor(R.color.colorBackground));
-//
-//        Button positiveButton = alertDialog.getButton(DialogInterface.BUTTON_POSITIVE);
-//        positiveButton.setBackgroundColor(getResources().getColor(R.color.colorBackground));
     }
 
-    private void shareToFacebookContent() {
+    private void shareToTwitter() {
+        BitmapDrawable imageDrawable = (BitmapDrawable) imageView.getDrawable();
+        if (imageDrawable != null) {
+            Bitmap bitmap = imageDrawable.getBitmap();
+
+            ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, bytes);
+            String path = MediaStore.Images.Media.insertImage(this.getContentResolver(), bitmap, "Title", null);
+            Uri uri = Uri.parse(path);
+
+            TweetComposer.Builder builder = new TweetComposer.Builder(this)
+                    .text(getString(R.string.share_caption))
+                    .image(uri);
+            builder.show();
+        } else {
+            Toast.makeText(MainActivity.this, R.string.share_fail, Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private void shareToFacebook() {
         callbackManager = CallbackManager.Factory.create();
         List<String> permissionNeeds = Arrays.asList("publish_actions");
         LoginManager loginManager = LoginManager.getInstance();
@@ -212,6 +238,7 @@ public class MainActivity extends AppCompatActivity implements Callback<KittyCat
     // These two methods are from the com.squareup.picasso.Callback implementation
     @Override
     public void onSuccess() {
+        buttonTwitter.setEnabled(true);
         buttonFacebook.setEnabled(true);
         progressWheel.setVisibility(View.INVISIBLE);
     }

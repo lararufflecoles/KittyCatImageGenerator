@@ -6,7 +6,8 @@
     <color name="color_toolbar_background">#3F51B5</color>
     <color name="color_toolbar_text">#FFFFFF</color>
 
-    <color name="color_button_text">#FFFFFF</color>
+    <color name="color_button_text_enabled_false">#616161</color>
+    <color name="color_button_text_enabled_true">#FFFFFF</color>
 
     <color name="color_alert_dialog_text">#000000</color>
 

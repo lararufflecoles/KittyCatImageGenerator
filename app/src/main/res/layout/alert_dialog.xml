@@ -12,7 +12,7 @@
         android:text="@string/alert_dialog_title" />
 
     <EditText
-        android:id="@+id/caption_facebook"
+        android:id="@+id/caption"
         style="@style/AlertDialogCaption"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

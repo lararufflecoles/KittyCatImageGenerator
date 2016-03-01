@@ -1,14 +1,21 @@
 <resources>
-    <string name="app_name">KittyCat IG</string>
+    <string name="app_name">KittyCat Image Generator</string>
+    <string name="app_website">KittyCat Image Generator</string>
 
     <!--Main Activity-->
     <string name="main_activity_toolbar_name">KittyCat Image Generator</string>
     <string name="button_kitty">Generate Kitty</string>
     <string name="button_cat">Generate Cat</string>
+    <string name="button_twitter">Share to Twitter</string>
     <string name="button_facebook">Share to Facebook</string>
 
+    <!--Share-->
+    <string name="share_caption">KittyCat Image Generator says \'miaow\'</string>
+    <string name="share_fail">Generate Kitty or Cat before sharing</string>
+    <string name="facebook_app_id">184845991889647</string>
+
     <!--Alert Dialog-->
-    <string name="alert_dialog_title">Share to Facebook</string>
+    <string name="alert_dialog_title">Share KittyCat</string>
     <string name="alert_dialog_back">Back</string>
     <string name="alert_dialog_share">Share</string>
 
@@ -26,9 +33,5 @@
         \t<a href="http://uk.linkedin.com/in/lararufflecoles">LinkedIn</a>
         \t<a href="https://twitter.com/lararufflecoles">Twitter</a>
     </string>
-
-    <!--Facebook-->
-    <string name="facebook_app_id">1751997151688923</string>
-
 
 </resources>

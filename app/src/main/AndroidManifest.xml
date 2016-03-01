@@ -2,11 +2,12 @@
     package="es.rufflecol.lara.kittycatimagegenerator">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <provider
-        android:name="com.facebook.FacebookContentProviderKittyCatImageGenerator"
-        android:authorities="com.facebook.app.FacebookContentProvider"
-        android:exported="true" />
+        android:authorities="com.facebook.app.FacebookContentProvider184845991889647"
+        android:name="com.facebook.FacebookContentProvider"
+        android:exported="true"/>
 
     <application
         android:allowBackup="true"
@@ -15,13 +16,18 @@
         android:theme="@style/AppTheme">
 
         <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="3c979dae1510dc9384a847dceff31f444dcb82e3" />
+
+        <meta-data
             android:name="com.facebook.sdk.ApplicationId"
             android:value="@string/facebook_app_id" />
 
         <!--Main Activity-->
         <activity
             android:name=".MainActivity"
-            android:label="@string/app_name">
+            android:label="@string/app_name"
+            android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
