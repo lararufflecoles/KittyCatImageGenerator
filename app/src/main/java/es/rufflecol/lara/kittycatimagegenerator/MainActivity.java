@@ -19,6 +19,7 @@ import android.widget.Toast;
 
 import com.facebook.CallbackManager;
 import com.facebook.FacebookSdk;
+import com.facebook.share.model.ShareLinkContent;
 import com.facebook.share.model.SharePhoto;
 import com.facebook.share.model.SharePhotoContent;
 import com.facebook.share.widget.ShareDialog;
@@ -152,7 +153,7 @@ public class MainActivity extends AppCompatActivity implements Callback<KittyCat
             Bitmap bitmap = imageDrawable.getBitmap();
             SharePhoto photo = new SharePhoto.Builder()
                     .setBitmap(bitmap)
-                    .setCaption(getString(R.string.share_caption))
+//                    .setCaption(getString(R.string.share_caption)) - Not allowed by Facebook
                     .build();
             SharePhotoContent content = new SharePhotoContent.Builder()
                     .addPhoto(photo)
@@ -184,7 +185,7 @@ public class MainActivity extends AppCompatActivity implements Callback<KittyCat
 
     @Override
     public void onFailure(Call<KittyCatModel> call, Throwable throwable) {
-        Toast.makeText(this, "Failed to access images", Toast.LENGTH_LONG).show();
+        Toast.makeText(this, "Failed to access images, please try again", Toast.LENGTH_LONG).show();
         progressWheel.setVisibility(View.INVISIBLE);
     }
 
