@@ -19,6 +19,8 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.crashlytics.android.Crashlytics;
+import com.crashlytics.android.Crashlytics;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookSdk;
 import com.facebook.share.model.ShareLinkContent;
@@ -87,7 +89,7 @@ public class MainActivity extends AppCompatActivity implements Callback<KittyCat
         api = KittyCatAPIFactory.create();
 
         TwitterAuthConfig authConfig = new TwitterAuthConfig(TWITTER_KEY, TWITTER_SECRET);
-        Fabric.with(this, new TwitterCore(authConfig), new TweetComposer());
+        Fabric.with(this, new TwitterCore(authConfig), new TweetComposer(), new Crashlytics());
 
         FacebookSdk.sdkInitialize(getApplicationContext());
         callbackManager = CallbackManager.Factory.create();
@@ -205,7 +207,7 @@ public class MainActivity extends AppCompatActivity implements Callback<KittyCat
             }
         } catch (PackageManager.NameNotFoundException exception) {
             exception.printStackTrace();
-            Toast.makeText(this, "Install Twitter to activate share button", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, R.string.install_twitter, Toast.LENGTH_LONG).show();
         }
 
         PackageManager packageManagerFacebook = this.getPackageManager();
@@ -217,7 +219,7 @@ public class MainActivity extends AppCompatActivity implements Callback<KittyCat
             }
         } catch (PackageManager.NameNotFoundException exception) {
             exception.printStackTrace();
-            Toast.makeText(this, "Install Facebook to activate share button", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, R.string.install_facebook, Toast.LENGTH_LONG).show();
         }
         progressWheel.setVisibility(View.INVISIBLE);
     }

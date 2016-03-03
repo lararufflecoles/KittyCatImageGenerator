@@ -12,6 +12,8 @@
     <!--Share-->
     <string name="share_caption">KittyCat Image Generator says \'miaow\'</string>
     <string name="share_fail">Generate Kitty or Cat before sharing</string>
+    <string name="install_twitter">Install Twitter to activate share button</string>
+    <string name="install_facebook">Install Facebook to activate share button</string>
     <string name="facebook_app_id">184845991889647</string>
 
     <!--About-->
