@@ -1,6 +1,8 @@
 package es.rufflecol.lara.kittycatimagegenerator;
 
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
@@ -97,6 +99,7 @@ public class MainActivity extends AppCompatActivity implements Callback<KittyCat
             public void onClick(View view) {
                 Call<KittyCatModel> call = api.getRandomKitty();
                 call.enqueue(MainActivity.this);
+                imageView.setImageResource(android.R.color.transparent);
                 progressWheel.setVisibility(View.VISIBLE);
             }
         });
@@ -107,6 +110,7 @@ public class MainActivity extends AppCompatActivity implements Callback<KittyCat
             public void onClick(View view) {
                 Call<KittyCatModel> call = api.getRandomCat();
                 call.enqueue(MainActivity.this);
+                imageView.setImageResource(android.R.color.transparent);
                 progressWheel.setVisibility(View.VISIBLE);
             }
         });
@@ -192,7 +196,17 @@ public class MainActivity extends AppCompatActivity implements Callback<KittyCat
     // These two methods are from the com.squareup.picasso.Callback implementation
     @Override
     public void onSuccess() {
-        buttonTwitter.setEnabled(true);
+        PackageManager packageManager = this.getPackageManager();
+        try {
+            PackageInfo packageInfo = packageManager.getPackageInfo("com.twitter.android", 0);
+            String getPackageInfo = packageInfo.toString();
+            if (! getPackageInfo.equals("com.twitter.android")) {
+                buttonTwitter.setEnabled(true);
+            }
+        } catch (PackageManager.NameNotFoundException exception) {
+            exception.printStackTrace();
+            Toast.makeText(this, "Install Twitter to activate share button", Toast.LENGTH_LONG).show();
+        }
         buttonFacebook.setEnabled(true);
         progressWheel.setVisibility(View.INVISIBLE);
     }
