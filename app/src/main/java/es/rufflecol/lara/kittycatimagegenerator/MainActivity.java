@@ -196,9 +196,9 @@ public class MainActivity extends AppCompatActivity implements Callback<KittyCat
     // These two methods are from the com.squareup.picasso.Callback implementation
     @Override
     public void onSuccess() {
-        PackageManager packageManager = this.getPackageManager();
+        PackageManager packageManagerTwitter = this.getPackageManager();
         try {
-            PackageInfo packageInfo = packageManager.getPackageInfo("com.twitter.android", 0);
+            PackageInfo packageInfo = packageManagerTwitter.getPackageInfo("com.twitter.android", 0);
             String getPackageInfo = packageInfo.toString();
             if (! getPackageInfo.equals("com.twitter.android")) {
                 buttonTwitter.setEnabled(true);
@@ -207,7 +207,18 @@ public class MainActivity extends AppCompatActivity implements Callback<KittyCat
             exception.printStackTrace();
             Toast.makeText(this, "Install Twitter to activate share button", Toast.LENGTH_LONG).show();
         }
-        buttonFacebook.setEnabled(true);
+
+        PackageManager packageManagerFacebook = this.getPackageManager();
+        try {
+            PackageInfo packageInfo = packageManagerFacebook.getPackageInfo("com.facebook.katana", 0);
+            String getPackageInfo = packageInfo.toString();
+            if (! getPackageInfo.equals("com.facebook.katana")) {
+                buttonFacebook.setEnabled(true);
+            }
+        } catch (PackageManager.NameNotFoundException exception) {
+            exception.printStackTrace();
+            Toast.makeText(this, "Install Facebook to activate share button", Toast.LENGTH_LONG).show();
+        }
         progressWheel.setVisibility(View.INVISIBLE);
     }
 
