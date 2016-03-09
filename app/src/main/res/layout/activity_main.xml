@@ -29,7 +29,7 @@
 
         <Space
             android:id="@+id/space"
-            android:layout_width="10dp"
+            android:layout_width="5dp"
             android:layout_height="wrap_content" />
 
         <Button
@@ -48,8 +48,8 @@
         android:layout_height="0dp"
         android:layout_below="@id/button_layout_generate"
         android:layout_weight="1"
-        android:paddingRight="16dp"
-        android:paddingLeft="16dp">
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp">
 
         <ImageView
             android:id="@+id/image"
@@ -84,12 +84,28 @@
             android:layout_below="@id/image"
             android:layout_weight="1"
             android:enabled="false"
-            android:textColor="@color/button_text"
-            android:text="@string/button_twitter" />
+            android:text="@string/button_twitter"
+            android:textColor="@color/button_text" />
 
         <Space
             android:id="@+id/space_left"
-            android:layout_width="10dp"
+            android:layout_width="5dp"
+            android:layout_height="wrap_content" />
+
+        <Button
+            android:id="@+id/button_save"
+            style="@style/Button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/image"
+            android:layout_weight="0.45"
+            android:enabled="false"
+            android:text="@string/button_save"
+            android:textColor="@color/button_text" />
+
+        <Space
+            android:id="@+id/space_right"
+            android:layout_width="5dp"
             android:layout_height="wrap_content" />
 
         <Button
@@ -100,8 +116,8 @@
             android:layout_below="@id/image"
             android:layout_weight="1"
             android:enabled="false"
-            android:textColor="@color/button_text"
-            android:text="@string/button_facebook" />
+            android:text="@string/button_facebook"
+            android:textColor="@color/button_text" />
 
     </LinearLayout>
 

@@ -1,20 +1,24 @@
 <resources>
     <string name="app_name">KittyCat Image Generator</string>
     <string name="app_website">KittyCat Image Generator</string>
+    <string name="facebook_app_id">184845991889647</string>
 
     <!--Main Activity-->
     <string name="main_activity_toolbar_name">KittyCat Image Generator</string>
     <string name="button_kitty">Generate Kitty</string>
     <string name="button_cat">Generate Cat</string>
-    <string name="button_twitter">Share to Twitter</string>
-    <string name="button_facebook">Share to Facebook</string>
+    <string name="button_twitter">Twitter share</string>
+    <string name="button_save">Save</string>
+    <string name="button_facebook">Facebook share</string>
 
-    <!--Share-->
-    <string name="share_caption">KittyCat Image Generator says \'miaow\'</string>
+    <!--Toasts-->
     <string name="share_fail">Generate Kitty or Cat before sharing</string>
     <string name="install_twitter">Install Twitter to activate share button</string>
+    <string name="image_saved">Image saved to device</string>
     <string name="install_facebook">Install Facebook to activate share button</string>
-    <string name="facebook_app_id">184845991889647</string>
+
+    <!--Twitter Share Message-->
+    <string name="share_caption">KittyCat Image Generator says \'miaow\'</string>
 
     <!--About-->
     <string name="about">About</string>

@@ -1,5 +1,8 @@
 package es.rufflecol.lara.kittycatimagegenerator;
 
+import android.content.ContentResolver;
+import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -20,10 +23,8 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
-import com.crashlytics.android.Crashlytics;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookSdk;
-import com.facebook.share.model.ShareLinkContent;
 import com.facebook.share.model.SharePhoto;
 import com.facebook.share.model.SharePhotoContent;
 import com.facebook.share.widget.ShareDialog;
@@ -33,6 +34,9 @@ import com.twitter.sdk.android.core.TwitterCore;
 import com.twitter.sdk.android.tweetcomposer.TweetComposer;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 import es.rufflecol.lara.kittycatimagegenerator.API.KittyCatAPI;
 import es.rufflecol.lara.kittycatimagegenerator.API.KittyCatAPIFactory;
@@ -49,6 +53,7 @@ public class MainActivity extends AppCompatActivity implements Callback<KittyCat
     private static final String KEY_URL = "MainActivity.Key_URL";
 
     private Button buttonFacebook;
+    private Button buttonSave;
     private Button buttonTwitter;
     private CallbackManager callbackManager;
     private ImageView imageView;
@@ -125,6 +130,14 @@ public class MainActivity extends AppCompatActivity implements Callback<KittyCat
             }
         });
 
+        buttonSave = (Button) findViewById(R.id.button_save);
+        buttonSave.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                saveToPhone();
+            }
+        });
+
         buttonFacebook = (Button) findViewById(R.id.button_facebook);
         buttonFacebook.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -153,13 +166,25 @@ public class MainActivity extends AppCompatActivity implements Callback<KittyCat
         }
     }
 
+    private void saveToPhone()  {
+        BitmapDrawable imageDrawable = (BitmapDrawable) imageView.getDrawable();
+        Bitmap bitmap = imageDrawable.getBitmap();
+
+        ContentResolver contentResolver = getContentResolver();
+        String title = "";
+        String description = "";
+        MediaStore.Images.Media.insertImage(contentResolver, bitmap, title, description);
+
+        Toast.makeText(MainActivity.this, R.string.image_saved, Toast.LENGTH_LONG).show();
+    }
+
     private void shareToFacebook() {
         BitmapDrawable imageDrawable = (BitmapDrawable) imageView.getDrawable();
         if (imageDrawable != null) {
             Bitmap bitmap = imageDrawable.getBitmap();
             SharePhoto photo = new SharePhoto.Builder()
                     .setBitmap(bitmap)
-//                    .setCaption(getString(R.string.share_caption)) - Not allowed by Facebook
+//                  .setCaption(getString(R.string.share_caption)) - Not allowed by Facebook
                     .build();
             SharePhotoContent content = new SharePhotoContent.Builder()
                     .addPhoto(photo)
@@ -202,7 +227,7 @@ public class MainActivity extends AppCompatActivity implements Callback<KittyCat
         try {
             PackageInfo packageInfo = packageManagerTwitter.getPackageInfo("com.twitter.android", 0);
             String getPackageInfo = packageInfo.toString();
-            if (! getPackageInfo.equals("com.twitter.android")) {
+            if (!getPackageInfo.equals("com.twitter.android")) {
                 buttonTwitter.setEnabled(true);
             }
         } catch (PackageManager.NameNotFoundException exception) {
@@ -214,13 +239,14 @@ public class MainActivity extends AppCompatActivity implements Callback<KittyCat
         try {
             PackageInfo packageInfo = packageManagerFacebook.getPackageInfo("com.facebook.katana", 0);
             String getPackageInfo = packageInfo.toString();
-            if (! getPackageInfo.equals("com.facebook.katana")) {
+            if (!getPackageInfo.equals("com.facebook.katana")) {
                 buttonFacebook.setEnabled(true);
             }
         } catch (PackageManager.NameNotFoundException exception) {
             exception.printStackTrace();
             Toast.makeText(this, R.string.install_facebook, Toast.LENGTH_LONG).show();
         }
+        buttonSave.setEnabled(true);
         progressWheel.setVisibility(View.INVISIBLE);
     }
 
