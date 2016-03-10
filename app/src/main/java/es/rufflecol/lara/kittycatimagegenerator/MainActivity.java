@@ -1,8 +1,9 @@
 package es.rufflecol.lara.kittycatimagegenerator;
 
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.ContentResolver;
 import android.content.Context;
-import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -11,6 +12,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -35,8 +37,6 @@ import com.twitter.sdk.android.tweetcomposer.TweetComposer;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 
 import es.rufflecol.lara.kittycatimagegenerator.API.KittyCatAPI;
 import es.rufflecol.lara.kittycatimagegenerator.API.KittyCatAPIFactory;
@@ -85,7 +85,7 @@ public class MainActivity extends AppCompatActivity implements Callback<KittyCat
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitleTextAppearance(this, R.style.Toolbar);
-        setTitle(R.string.main_activity_toolbar_name);
+        setTitle(R.string.app_name);
         setSupportActionBar(toolbar);
 
         progressWheel = (ProgressBar) findViewById(R.id.progress_bar);
@@ -155,27 +155,44 @@ public class MainActivity extends AppCompatActivity implements Callback<KittyCat
             ByteArrayOutputStream bytes = new ByteArrayOutputStream();
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, bytes);
             String path = MediaStore.Images.Media.insertImage(this.getContentResolver(), bitmap, "Title", null);
-            Uri uri = Uri.parse(path);
+            Uri imageUri = Uri.parse(path);
 
             TweetComposer.Builder builder = new TweetComposer.Builder(this)
                     .text(getString(R.string.share_caption))
-                    .image(uri);
+                    .image(imageUri);
             builder.show();
         } else {
             Toast.makeText(MainActivity.this, R.string.share_fail, Toast.LENGTH_LONG).show();
         }
     }
 
-    private void saveToPhone()  {
+    private void saveToPhone() {
         BitmapDrawable imageDrawable = (BitmapDrawable) imageView.getDrawable();
         Bitmap bitmap = imageDrawable.getBitmap();
 
         ContentResolver contentResolver = getContentResolver();
         String title = "";
         String description = "";
-        MediaStore.Images.Media.insertImage(contentResolver, bitmap, title, description);
+        String path = MediaStore.Images.Media.insertImage(contentResolver, bitmap, title, description);
+        Uri imageUri = Uri.parse(path);
 
-        Toast.makeText(MainActivity.this, R.string.image_saved, Toast.LENGTH_LONG).show();
+        Intent saveIntent = new Intent(Intent.ACTION_SEND);
+        saveIntent.setType("image/jpeg");
+        saveIntent.putExtra(Intent.EXTRA_STREAM, imageUri);
+
+        Intent chooserIntent = Intent.createChooser(saveIntent, getResources().getText(R.string.notification_image_share));
+        PendingIntent pendingSaveIntent = PendingIntent.getActivity(this, 0, chooserIntent, PendingIntent.FLAG_ONE_SHOT);
+
+        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
+                .setPriority(0)
+                .setSmallIcon(R.drawable.ic_image_white_24dp)
+                .setContentTitle(getString(R.string.app_name))
+                .setContentText(getString(R.string.notification_image_saved))
+                .setContentIntent(pendingSaveIntent)
+                .addAction(R.drawable.ic_share_white_24dp, "Share", pendingSaveIntent);
+
+        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.notify(001, notificationBuilder.build()); // The first parameter allows you to update the notification later on
     }
 
     private void shareToFacebook() {
