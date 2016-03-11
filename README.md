@@ -1,4 +1,6 @@
-# KittyCatImageGenerator is now available to download on the GooglePlay store:
+# KittyCatImageGenerator
+
+KittyCatImageGenerator is now available to download on the GooglePlay store:
 
 https://play.google.com/store/apps/details?id=es.rufflecol.lara.kittycatimagegenerator
 
