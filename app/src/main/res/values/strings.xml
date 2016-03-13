@@ -13,9 +13,11 @@
     <!--Notification-->
     <string name="notification_image_saved">Image saved to device</string>
     <string name="notification_image_share">Share</string>
+    <string name="notification_image_set_wallpaper">Set as Wallpaper</string>
 
     <!--Toasts-->
     <string name="share_fail">Generate Kitty or Cat before sharing</string>
+    <string name="save_fail">Generate Kitty or Cat before saving</string>
     <string name="install_twitter">Install Twitter to activate share button</string>
     <string name="install_facebook">Install Facebook to activate share button</string>
 

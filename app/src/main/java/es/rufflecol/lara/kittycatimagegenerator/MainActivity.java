@@ -1,15 +1,19 @@
 package es.rufflecol.lara.kittycatimagegenerator;
 
+import android.annotation.SuppressLint;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.app.WallpaperManager;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.app.NotificationCompat;
@@ -36,7 +40,7 @@ import com.twitter.sdk.android.core.TwitterCore;
 import com.twitter.sdk.android.tweetcomposer.TweetComposer;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
+import java.io.IOException;
 
 import es.rufflecol.lara.kittycatimagegenerator.API.KittyCatAPI;
 import es.rufflecol.lara.kittycatimagegenerator.API.KittyCatAPIFactory;
@@ -52,6 +56,8 @@ public class MainActivity extends AppCompatActivity implements Callback<KittyCat
     private static final String TWITTER_SECRET = "YEGuJUd7H3OgNGJP7yTPrYDaQIbh76Hi0DqVjOcQ8ddqqbQM07";
     private static final String KEY_URL = "MainActivity.Key_URL";
 
+    private Bitmap bitmap;
+    private BitmapDrawable imageDrawable;
     private Button buttonFacebook;
     private Button buttonSave;
     private Button buttonTwitter;
@@ -61,6 +67,7 @@ public class MainActivity extends AppCompatActivity implements Callback<KittyCat
     private ProgressBar progressWheel;
     private ShareDialog shareDialog;
     private String url;
+    private Uri imageUri;
 
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
@@ -134,7 +141,7 @@ public class MainActivity extends AppCompatActivity implements Callback<KittyCat
         buttonSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                saveToPhone();
+                saveToDevice();
             }
         });
 
@@ -148,14 +155,14 @@ public class MainActivity extends AppCompatActivity implements Callback<KittyCat
     }
 
     private void shareToTwitter() {
-        BitmapDrawable imageDrawable = (BitmapDrawable) imageView.getDrawable();
+        imageDrawable = (BitmapDrawable) imageView.getDrawable();
         if (imageDrawable != null) {
-            Bitmap bitmap = imageDrawable.getBitmap();
+            bitmap = imageDrawable.getBitmap();
 
             ByteArrayOutputStream bytes = new ByteArrayOutputStream();
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, bytes);
             String path = MediaStore.Images.Media.insertImage(this.getContentResolver(), bitmap, "Title", null);
-            Uri imageUri = Uri.parse(path);
+            imageUri = Uri.parse(path);
 
             TweetComposer.Builder builder = new TweetComposer.Builder(this)
                     .text(getString(R.string.share_caption))
@@ -166,39 +173,56 @@ public class MainActivity extends AppCompatActivity implements Callback<KittyCat
         }
     }
 
-    private void saveToPhone() {
-        BitmapDrawable imageDrawable = (BitmapDrawable) imageView.getDrawable();
-        Bitmap bitmap = imageDrawable.getBitmap();
+    @SuppressLint("NewApi")
+    private void saveToDevice() {
+        imageDrawable = (BitmapDrawable) imageView.getDrawable();
+        if (imageDrawable != null) {
+            bitmap = imageDrawable.getBitmap();
 
-        ContentResolver contentResolver = getContentResolver();
-        String title = "";
-        String description = "";
-        String path = MediaStore.Images.Media.insertImage(contentResolver, bitmap, title, description);
-        Uri imageUri = Uri.parse(path);
+            ContentResolver contentResolver = getContentResolver();
+            String title = "";
+            String description = "";
+            String path = MediaStore.Images.Media.insertImage(contentResolver, bitmap, title, description);
+            imageUri = Uri.parse(path);
 
-        Intent saveIntent = new Intent(Intent.ACTION_SEND);
-        saveIntent.setType("image/jpeg");
-        saveIntent.putExtra(Intent.EXTRA_STREAM, imageUri);
+            PendingIntent setWallpaperPendingIntent;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                WallpaperManager wallpaperManager = WallpaperManager.getInstance(getApplicationContext());
+                Intent setWallpaperIntent = wallpaperManager.getCropAndSetWallpaperIntent(imageUri);
+                setWallpaperPendingIntent = PendingIntent.getActivity(this, 0, setWallpaperIntent, PendingIntent.FLAG_ONE_SHOT);
+            } else {
+                Intent setWallpaperIntent = new Intent(this, SetWallpaperService.class);
+                setWallpaperIntent.putExtra(Intent.EXTRA_STREAM, imageUri);
+                setWallpaperPendingIntent = PendingIntent.getService(this, 0, setWallpaperIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+            }
 
-        Intent chooserIntent = Intent.createChooser(saveIntent, getResources().getText(R.string.notification_image_share));
-        PendingIntent pendingSaveIntent = PendingIntent.getActivity(this, 0, chooserIntent, PendingIntent.FLAG_ONE_SHOT);
+            Intent saveImageIntent = new Intent(Intent.ACTION_SEND);
+            saveImageIntent.setType("image/png");
+            saveImageIntent.putExtra(Intent.EXTRA_STREAM, imageUri);
+            Intent chooserIntent = Intent.createChooser(saveImageIntent, getResources().getText(R.string.notification_image_share));
+            PendingIntent shareImagePendingIntent = PendingIntent.getActivity(this, 0, chooserIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
-                .setPriority(0)
-                .setSmallIcon(R.drawable.ic_image_white_24dp)
-                .setContentTitle(getString(R.string.app_name))
-                .setContentText(getString(R.string.notification_image_saved))
-                .setContentIntent(pendingSaveIntent)
-                .addAction(R.drawable.ic_share_white_24dp, "Share", pendingSaveIntent);
+            NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
+                    .setPriority(0)
+                    .setSmallIcon(R.drawable.ic_image_white_24dp)
+                    .setContentTitle(getString(R.string.app_name))
+                    .setContentText(getString(R.string.notification_image_saved))
 
-        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.notify(001, notificationBuilder.build()); // The first parameter allows you to update the notification later on
+//                  .setContentIntent(shareImagePendingIntent); WTF does this do and why is the line below now deprecated in SDK 23? How do I use the other .addAction?
+                    .addAction(R.drawable.ic_image_white_24dp, (getString(R.string.notification_image_set_wallpaper)), setWallpaperPendingIntent)
+                    .addAction(R.drawable.ic_share_white_24dp, (getString(R.string.notification_image_share)), shareImagePendingIntent);
+
+            NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            notificationManager.notify(001, notificationBuilder.build()); // The first parameter allows you to update the notification later on
+        } else {
+            Toast.makeText(MainActivity.this, R.string.save_fail, Toast.LENGTH_LONG).show();
+        }
     }
 
     private void shareToFacebook() {
-        BitmapDrawable imageDrawable = (BitmapDrawable) imageView.getDrawable();
+        imageDrawable = (BitmapDrawable) imageView.getDrawable();
         if (imageDrawable != null) {
-            Bitmap bitmap = imageDrawable.getBitmap();
+            bitmap = imageDrawable.getBitmap();
             SharePhoto photo = new SharePhoto.Builder()
                     .setBitmap(bitmap)
 //                  .setCaption(getString(R.string.share_caption)) - Not allowed by Facebook
