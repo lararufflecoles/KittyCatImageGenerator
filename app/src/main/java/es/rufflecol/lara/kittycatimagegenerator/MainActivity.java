@@ -54,10 +54,14 @@ public class MainActivity extends AppCompatActivity implements Callback<KittyCat
 
     private static final String TWITTER_KEY = "6ztLMhGmShpEmvqwm2QYr7uGX";
     private static final String TWITTER_SECRET = "YEGuJUd7H3OgNGJP7yTPrYDaQIbh76Hi0DqVjOcQ8ddqqbQM07";
-    private static final String KEY_URL = "MainActivity.Key_URL";
+    private static final String KEY_URL = "MainActivity.KeyURL";
+    private static final String KEY_TOAST_SHOWN_TWITTER = "MainActivity.KeyToastShownTwitter";
+    private static final String KEY_TOAST_SHOWN_FACEBOOK = "MainActivity.KeyToastShownFacebook";
 
     private Bitmap bitmap;
     private BitmapDrawable imageDrawable;
+    private boolean toastShownTwitter = false;
+    private boolean toastShownFacebook = false;
     private Button buttonFacebook;
     private Button buttonSave;
     private Button buttonTwitter;
@@ -73,6 +77,8 @@ public class MainActivity extends AppCompatActivity implements Callback<KittyCat
     public void onSaveInstanceState(Bundle savedInstanceState) {
         super.onSaveInstanceState(savedInstanceState);
         savedInstanceState.putString(KEY_URL, url);
+        savedInstanceState.putBoolean(KEY_TOAST_SHOWN_TWITTER, toastShownTwitter);
+        savedInstanceState.putBoolean(KEY_TOAST_SHOWN_FACEBOOK, toastShownFacebook);
     }
 
     public void onRestoreInstanceState(Bundle savedInstanceState) {
@@ -83,6 +89,8 @@ public class MainActivity extends AppCompatActivity implements Callback<KittyCat
                 .fit()
                 .centerInside()
                 .into(imageView, this);
+        toastShownTwitter = savedInstanceState.getBoolean(KEY_TOAST_SHOWN_TWITTER);
+        toastShownFacebook = savedInstanceState.getBoolean(KEY_TOAST_SHOWN_FACEBOOK);
     }
 
     @Override
@@ -257,36 +265,37 @@ public class MainActivity extends AppCompatActivity implements Callback<KittyCat
 
     @Override
     public void onFailure(Call<KittyCatModel> call, Throwable throwable) {
-        Toast.makeText(this, "Failed to access images, please try again", Toast.LENGTH_LONG).show();
+        Toast.makeText(this, R.string.image_fail, Toast.LENGTH_LONG).show();
         progressWheel.setVisibility(View.INVISIBLE);
     }
 
     // These two methods are from the com.squareup.picasso.Callback implementation
     @Override
     public void onSuccess() {
-        PackageManager packageManagerTwitter = this.getPackageManager();
+        PackageManager packageManager = getPackageManager();
+
         try {
-            PackageInfo packageInfo = packageManagerTwitter.getPackageInfo("com.twitter.android", 0);
-            String getPackageInfo = packageInfo.toString();
-            if (!getPackageInfo.equals("com.twitter.android")) {
-                buttonTwitter.setEnabled(true);
-            }
+            packageManager.getPackageInfo("com.twitter.android", 0); // getPackageInfo will throw exception if Twitter not installed and we won't reach line below
+            buttonTwitter.setEnabled(true);
         } catch (PackageManager.NameNotFoundException exception) {
             exception.printStackTrace();
-            Toast.makeText(this, R.string.install_twitter, Toast.LENGTH_LONG).show();
+            if (!toastShownTwitter) {
+                Toast.makeText(this, R.string.install_twitter, Toast.LENGTH_LONG).show();
+                toastShownTwitter = true;
+            }
         }
 
-        PackageManager packageManagerFacebook = this.getPackageManager();
         try {
-            PackageInfo packageInfo = packageManagerFacebook.getPackageInfo("com.facebook.katana", 0);
-            String getPackageInfo = packageInfo.toString();
-            if (!getPackageInfo.equals("com.facebook.katana")) {
-                buttonFacebook.setEnabled(true);
-            }
+            packageManager.getPackageInfo("com.facebook.katana", 0); // getPackageInfo will throw exception if Facebook not installed and we won't reach line below
+            buttonFacebook.setEnabled(true);
         } catch (PackageManager.NameNotFoundException exception) {
             exception.printStackTrace();
-            Toast.makeText(this, R.string.install_facebook, Toast.LENGTH_LONG).show();
+            if (!toastShownFacebook) {
+                Toast.makeText(this, R.string.install_facebook, Toast.LENGTH_LONG).show();
+                toastShownFacebook = true;
+            }
         }
+        
         buttonSave.setEnabled(true);
         progressWheel.setVisibility(View.INVISIBLE);
     }
@@ -294,6 +303,7 @@ public class MainActivity extends AppCompatActivity implements Callback<KittyCat
     @Override
     public void onError() {
         progressWheel.setVisibility(View.INVISIBLE);
+
     }
 
     // Menu code
