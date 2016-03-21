@@ -215,6 +215,8 @@ public class MainActivity extends AppCompatActivity implements Callback<KittyCat
                     .setSmallIcon(R.drawable.ic_image_white_24dp)
                     .setContentTitle(getString(R.string.app_name))
                     .setContentText(getString(R.string.notification_image_saved))
+
+//                  .setContentIntent(shareImagePendingIntent); WTF does this do and why is the line below now deprecated in SDK 23? How do I use the other .addAction?
                     .addAction(R.drawable.ic_image_white_24dp, (getString(R.string.notification_image_set_wallpaper)), setWallpaperPendingIntent)
                     .addAction(R.drawable.ic_share_white_24dp, (getString(R.string.notification_image_share)), shareImagePendingIntent);
 
